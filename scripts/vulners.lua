@@ -31,3 +31,13 @@ portrule = function(host, port)
     local vers=port.version
     return vers ~= nil and vers.version ~= nil
 end
+
+function make_links(vulns)
+    local output_str=""
+    local is_exploit=false
+    local cvss_score=""
+
+    local vulns_result = {}
+    for _, v in ipairs(vulns.data.search) do
+        table.insert(vulns_result, v)
+    end
