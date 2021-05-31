@@ -97,4 +97,11 @@ class DB:
         host.scope = value
         self.session.add(host)
         self.session.commit()
-        
+
+    def add_note(self, host_id, title, text):
+        add_note = notes(host_id=host_id, title=title, text=text)
+
+        self.session.add(add_note)
+        self.session.commit()
+
+        return title, self.session.query(notes).order_by(notes.id.desc()).first().id
