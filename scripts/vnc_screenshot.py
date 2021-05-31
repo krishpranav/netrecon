@@ -25,3 +25,8 @@ def screenshot(dpy):
 	# quit
 	Gtk.main_quit()
 	quit()		
+
+def vnc_connected(dpy):
+    thread = threading.Thread(target=screenshot, args=[dpy])
+    thread.start()
+    
