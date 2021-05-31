@@ -85,4 +85,11 @@ class DB:
         self.session = DBSession()
 
         self.nmap_service_loc = "/usr/share/nmap/nmap-services"
-        
+
+    
+    def _find_nmap_service(self, port, transport):
+        with open(self.nmap_service_loc, 'r') as f:
+            for line in f.readlines():
+                if str(port)+"/"+transport in line:
+                    return line.split()[0]
+                    
