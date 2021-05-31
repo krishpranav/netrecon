@@ -92,4 +92,9 @@ class DB:
             for line in f.readlines():
                 if str(port)+"/"+transport in line:
                     return line.split()[0]
-                    
+
+    def switch_scope(self, value, host):
+        host.scope = value
+        self.session.add(host)
+        self.session.commit()
+        
