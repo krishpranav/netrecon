@@ -107,4 +107,15 @@ function get_vulns_by_cpe(cpe)
     if not vers then 
         return ""
     end 
+
+    output_str = get_results(cpe, vers, "cpe")
+
+    if output_str == "" then 
+        local new_cpe
+
+        new_cpe = cpe:gsub(vers_regexp, ":%1:%2")
+        output_str = get_result(new_cpe, vers, "cpe")
+    end
     
+    return output_str
+end
