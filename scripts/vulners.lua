@@ -18,3 +18,11 @@ software name and its version (or CPE), so one can still have the desired privac
 author = 'krishpranav'
 license = 'Same as nmap--see https://nmap.org/book/man-legal.html'
 categories = {"vuln", "safe", "external"}
+
+local http = require "http"
+local json = require "json"
+local string = require "string"
+local table = require "table"
+
+local api_version="1.2"
+local mincvss=nmap.registry.args.mincvss and tonumber(nmap.registry.args.mincvss) or 0.0
