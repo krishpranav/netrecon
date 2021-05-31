@@ -92,3 +92,7 @@ function get_result(what, vers, type)
 
     return ""
 end
+
+function get_vulns_by_software(software, version)
+    return get_results(software, version, "software")
+end
