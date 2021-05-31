@@ -29,4 +29,18 @@ def screenshot(dpy):
 def vnc_connected(dpy):
     thread = threading.Thread(target=screenshot, args=[dpy])
     thread.start()
-    
+
+if __name__ == "__main__":
+    	
+	dpy = GtkVnc.Display()
+	dpy.open_host(sys.argv[1], sys.argv[2])
+
+	dpy.connect("vnc-initialized", vnc_connected)
+
+	# stupid workaround needed to suppress gdk warnings
+	win = Gtk.Window()
+	win.show()
+	win.hide()
+	win.add(dpy)
+
+	Gtk.main()
