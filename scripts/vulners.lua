@@ -58,4 +58,17 @@ function make_links(vulns)
     end
     
     return output_str
-  end
+end
+
+function get_result(what, vers, type)
+    local v_host="vulners.com"
+    local v_port=443
+    local response, path
+    local status, error
+    local vulns
+    local options={header={}}
+
+    option['header']['User-Agent'] = string.format('Vulners NMAP Plugin %s', api_version)
+
+    path = '/api/v3/burp/software/' .. '?software=' .. what .. '&version=' .. vers .. '&type=' .. type
+    
