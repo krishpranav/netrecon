@@ -1,0 +1,16 @@
+admin
+root
+Administrator
+administrator
+operator
+sa
+boss
+bin
+daemon
+adm
+lp
+sync
+shutdown
+halt
+mail
+news
