@@ -35,3 +35,18 @@ class targets(Base):
 	country_name  = Column(String(100), nullable=True)
 	isp           = Column(String(100), nullable=True)
 	organization  = Column(String(100), nullable=True)
+
+
+
+class services(Base):
+    	__tablename__ = "services"
+
+	id          = Column(Integer, primary_key=True)
+	port        = Column(Integer, nullable=False)
+	protocol    = Column(String(3), nullable=False)
+	service     = Column(String(200), nullable=False)
+	fingerprint = Column(Text, nullable=True)
+	state       = Column(String(200), nullable=False)
+	banner      = Column(Text, nullable=True)
+	host        = relationship(targets)
+	host_id     = Column(Integer, ForeignKey('targets.id'))
