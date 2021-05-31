@@ -14,3 +14,7 @@ Since the size of the DB with all the vulns is more than 250GB there is no way t
 So we do make requests to a remote service. Still all the requests contain just two fields - the 
 software name and its version (or CPE), so one can still have the desired privacy.
 ]]
+
+author = 'krishpranav'
+license = 'Same as nmap--see https://nmap.org/book/man-legal.html'
+categories = {"vuln", "safe", "external"}
