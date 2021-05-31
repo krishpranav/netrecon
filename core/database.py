@@ -63,3 +63,13 @@ class activity_log(Base):
 	output     = Column(Text, nullable=True)
 	extension  = Column(Text, nullable=True)
 	target     = Column(Text, nullable=True)
+
+
+class notes(Base):
+    __tablename__ = "notes"
+
+	id      = Column(Integer, primary_key=True)
+	host    = relationship(targets)
+	host_id = Column(Integer, ForeignKey("targets.id"))
+	title   = Column(String(200))
+	text    = Column(Text)
