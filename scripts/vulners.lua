@@ -36,8 +36,26 @@ function make_links(vulns)
     local output_str=""
     local is_exploit=false
     local cvss_score=""
-
-    local vulns_result = {}
+      
+    local vulns_result = {} 
     for _, v in ipairs(vulns.data.search) do
-        table.insert(vulns_result, v)
+      table.insert(vulns_result, v)
     end
+  
+    table.sort(vulns_result, function(a, b)
+                                return a._source.cvss.score > b._source.cvss.score
+                             end
+    )
+  
+    for _, vuln in ipairs(vulns_result) do
+      is_exploit = vuln._source.bulletinFamily:lower() == "exploit"
+  
+      cvss_score = vuln._source.cvss and (type(vuln._source.cvss.score) == "number") and (vuln._source.cvss.score) or ""
+  
+      if is_exploit or (cvss_score ~= "" and mincvss <= tonumber(cvss_score)) then
+        output_str = string.format("%s\n\t%s", output_str, vuln._source.id .. "\t\t" .. cvss_score .. '\t\thttps://vulners.com/' .. vuln._source.type .. '/' .. vuln._source.id .. (is_exploit and '\t\t*EXPLOIT*' or ''))
+      end
+    end
+    
+    return output_str
+  end
