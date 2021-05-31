@@ -26,3 +26,8 @@ local table = require "table"
 
 local api_version="1.2"
 local mincvss=nmap.registry.args.mincvss and tonumber(nmap.registry.args.mincvss) or 0.0
+
+portrule = function(host, port)
+    local vers=port.version
+    return vers ~= nil and vers.version ~= nil
+end
