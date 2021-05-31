@@ -32,3 +32,9 @@ class BugMeNot:
             print(e)            
             print ('Http Error! Please check the url you input and the network connection')
             sys.exit()
+
+        re_loginpwd = re.compile(self.regex, re.IGNORECASE | re.DOTALL)
+
+        match = re_loginpwd.findall(page)
+
+        return [{'username':i, 'password':j, 'stats':s} for i, j, s in match if i and j and len(i) < 30]
