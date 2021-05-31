@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-
+// description
 description = [[
 For each available CPE the script prints out known vulns (links to the correspondent info) and correspondent CVSS scores.
 Its work is pretty simple:
@@ -71,4 +71,24 @@ function get_result(what, vers, type)
     option['header']['User-Agent'] = string.format('Vulners NMAP Plugin %s', api_version)
 
     path = '/api/v3/burp/software/' .. '?software=' .. what .. '&version=' .. vers .. '&type=' .. type
-    
+
+    response = http.get(v_host, v_port, path, option)
+
+    status = response.status
+
+    if status == nil then
+        return ""
+    elseif status ~= 200 then
+        return ""
+    end
+
+    status, vulns = json.parse(response.body)
+
+    if status == true then
+        if vulns.result == "OK" then
+            return make_links(vulns)
+        end
+    end
+
+    return ""
+end
