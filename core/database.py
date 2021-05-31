@@ -69,3 +69,20 @@ class notes(Base):
 	host_id = Column(Integer, ForeignKey("targets.id"))
 	title   = Column(String(200))
 	text    = Column(Text)
+
+
+class DB:
+    
+    
+    def __init__(self, db_loc):
+        
+        engine = create_engine("sqlite:///"+db_loc)
+        Base.metadata.create_all(engine)
+        Base.metadata.bind = engine
+        DBSession = sessionmaker(bind=engine)
+
+        self.db_loc = db_loc
+        self.session = DBSession()
+
+        self.nmap_service_loc = "/usr/share/nmap/nmap-services"
+        
