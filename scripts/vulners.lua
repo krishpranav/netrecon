@@ -96,3 +96,15 @@ end
 function get_vulns_by_software(software, version)
     return get_results(software, version, "software")
 end
+
+function get_vulns_by_cpe(cpe)
+    local vers
+    local vers_regexp=":([%d%.%-%_]+)([^:]*)$"
+    local output_str=""
+
+    _, _, vers = cpe:find(vers_regexp)
+
+    if not vers then 
+        return ""
+    end 
+    
