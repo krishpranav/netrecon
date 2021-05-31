@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # imports
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Boolean, Float
@@ -70,44 +70,184 @@ class notes(Base):
 	title   = Column(String(200))
 	text    = Column(Text)
 
-
 class DB:
-    
-    
-    def __init__(self, db_loc):
-        
-        engine = create_engine("sqlite:///"+db_loc)
-        Base.metadata.create_all(engine)
-        Base.metadata.bind = engine
-        DBSession = sessionmaker(bind=engine)
 
-        self.db_loc = db_loc
-        self.session = DBSession()
+	def __init__(self, db_loc):
 
-        self.nmap_service_loc = "/usr/share/nmap/nmap-services"
+		engine = create_engine("sqlite:///"+db_loc)
+		Base.metadata.create_all(engine)
+		Base.metadata.bind = engine
+		DBSession = sessionmaker(bind=engine)
 
-    
-    def _find_nmap_service(self, port, transport):
-        with open(self.nmap_service_loc, 'r') as f:
-            for line in f.readlines():
-                if str(port)+"/"+transport in line:
-                    return line.split()[0]
+		self.db_loc = db_loc
+		self.session = DBSession()
 
-    def switch_scope(self, value, host):
-        host.scope = value
-        self.session.add(host)
-        self.session.commit()
+		# nmap well known services file location
+		self.nmap_service_loc = "/usr/share/nmap/nmap-services"
 
-    def add_note(self, host_id, title, text):
-        add_note = notes(host_id=host_id, title=title, text=text)
 
-        self.session.add(add_note)
-        self.session.commit()
+	def _find_nmap_service(self, port, trasport):
+		 
 
-        return title, self.session.query(notes).order_by(notes.id.desc()).first().id
+		with open(self.nmap_service_loc,'r') as f:
+			for line in f.readlines():
+				if str(port)+"/"+trasport in line:
 
-    def add_host(self, address):
-        add_host = targets(address=address)
+					return line.split()[0]
 
-        self.session.add(add_host)
-        self.session.commit()
+	def switch_scope(self, value, host):
+		 
+
+		host.scope = value
+		self.session.add(host)
+		self.session.commit()
+
+	def add_note(self, host_id, title, text):
+		 
+		add_note = notes(host_id=host_id, title=title, text=text)
+
+		self.session.add(add_note)
+		self.session.commit()
+
+		return title, self.session.query(notes).order_by(notes.id.desc()).first().id
+
+	def add_host(self, address):
+		 
+		add_host = targets(address=address)
+
+		self.session.add(add_host)
+		self.session.commit()
+
+	def add_log(self, pid, start_dat, end_dat, title, target, output, extension):
+		 
+
+		log_add = activity_log( pid=pid, start_time=start_dat, end_time = end_dat, title=title, output=output, extension = extension, target = target )
+		self.session.add(log_add)
+		self.session.commit()
+
+		return self.get_log_id()
+
+	def save_note(self, note_id, value):
+
+		note = self.session.query(notes).filter( notes.id == note_id ).one()
+		note.text=value
+		self.session.commit()
+
+	def get_host_by_name(self, ipv4):
+
+		try:
+			return self.session.query(targets).filter( targets.address == ipv4 ).one()
+
+		except:
+			return False
+
+	def host_exist(self, ipv4):
+		# function to check if a host is already in the databse
+		if len(self.session.query(targets).filter( targets.address == ipv4 ).all()) > 0:
+			return True
+		
+		return False
+
+	def get_host_service(self, host_id, port, protocol):
+		# function to check if a port is already in the database
+
+		try:
+			return  self.session.query(services).filter( services.host_id == host_id, services.port == port, services.protocol == protocol ).one()
+
+		except:
+			return False	
+
+	def port_exist(self, host_id, port, protocol):
+		# function to check if a port is already in the database
+		if len(self.session.query(services).filter( services.host_id == host_id, services.port == port, services.protocol == protocol ).all()) > 0:
+			return True
+		
+		return False
+
+	def get_note(self, note_id):
+		return self.session.query(notes).filter( notes.id == note_id ).one()
+
+	def get_notes(self, host_id):
+		return self.session.query(notes).filter( notes.host_id == host_id ).all()
+
+	def get_hosts(self):
+		return self.session.query(targets).all()
+
+	def get_host(self, id):
+		return self.session.query(targets).filter( targets.id == id ).one()
+
+	def get_port(self,id):
+		return self.session.query(services).filter( services.id == id ).one()
+
+	def get_service(self, id):
+		return self.session.query(services).filter( services.service == id ).all()
+
+	def get_services_uniq(self, scope=True):
+
+		if scope: return self.session.query(services.service).distinct()
+		else: return self.session.query(services.service).filter( services.host.has( scope = True ) ).distinct()
+
+	def get_ports_by_service(self, service, scope=True):
+
+		if scope: return self.session.query(services).filter( services.service == service ).all()
+		else: return self.session.query(services).filter( services.host.has( scope = True ) ).filter( services.service == service ).all()
+
+
+	def get_ports_by_host(self, host):
+		return self.session.query(services).filter( services.host == host ).all()
+
+
+	def get_logs(self, id=''):
+		if id == '':
+			return self.session.query(activity_log).all()
+		
+		return self.session.query(activity_log).filter( activity_log.id == int(id) ).one()
+
+	def get_history(self, host):
+		try:
+			return self.session.query(activity_log).filter( activity_log.target.contains(host.address) | activity_log.target.contains(host.hostname.split(" ")[1]) ).all() # split FIXME
+		except:
+			return self.session.query(activity_log).filter( activity_log.target == host.address ).all()
+
+
+	def get_log_id(self):
+		return self.session.query(activity_log).order_by(activity_log.id.desc()).first().id
+
+	def remove_log(self,id):
+		todel = self.session.query(activity_log).filter( activity_log.id == id ).one()
+		self.session.delete(todel)
+		self.session.commit()
+
+		return True
+
+	def remove_note(self, id):
+		id = int(id)
+		todel = self.session.query(notes).filter( notes.id == id ).one()
+
+		self.session.delete(todel)
+		self.session.commit()
+
+		return True
+
+
+	def remove_host(self, id):
+		todel = self.session.query(targets).filter( targets.id == id ).one()
+		todel_2 = self.session.query(services).filter( services.host_id == id ).all()
+
+		self.session.delete(todel)
+		for to in todel_2:
+			self.session.delete(to)
+
+		self.session.commit()
+
+
+		return True
+
+
+	def rename_note(self, id, newname):
+		toren = self.session.query(notes).filter( notes.id == id ).one()
+		toren.title = newname
+
+		self.session.commit()
+
+		return True
