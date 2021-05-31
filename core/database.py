@@ -11,7 +11,7 @@ from sqlalchemy import update
 Base = declarative_base()
 
 class targets(Base):
-    	__tablename__ = "targets"
+    __tablename__ = "targets"
 
 	id            = Column(Integer, primary_key=True)
 	address       = Column(String(50), nullable=False)
@@ -39,7 +39,7 @@ class targets(Base):
 
 
 class services(Base):
-    	__tablename__ = "services"
+    __tablename__ = "services"
 
 	id          = Column(Integer, primary_key=True)
 	port        = Column(Integer, nullable=False)
@@ -50,3 +50,16 @@ class services(Base):
 	banner      = Column(Text, nullable=True)
 	host        = relationship(targets)
 	host_id     = Column(Integer, ForeignKey('targets.id'))
+
+
+class activity_log(Base):
+    __tablename__ = "activity_log"
+
+	id         = Column(Integer, primary_key=True)
+	pid        = Column(Integer, nullable=False)
+	start_time = Column(String(200), nullable=False)
+	end_time   = Column(String(200), nullable=False)
+	title      = Column(String(200), nullable=False)
+	output     = Column(Text, nullable=True)
+	extension  = Column(Text, nullable=True)
+	target     = Column(Text, nullable=True)
