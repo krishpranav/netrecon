@@ -105,3 +105,9 @@ class DB:
         self.session.commit()
 
         return title, self.session.query(notes).order_by(notes.id.desc()).first().id
+
+    def add_host(self, address):
+        add_host = targets(address=address)
+
+        self.session.add(add_host)
+        self.session.commit()
